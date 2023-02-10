@@ -6,12 +6,14 @@ namespace TimedChecker.Job.Services;
 
 public class VfsAppointmentsService : IAppointmentsService
 {
-    private readonly VfsSettings _settings;
-    private IPlaywright _playwright;
+    private readonly JobSettings _jobSettings;
+    private readonly VfsSettings _vfsSettings;
+    private IPlaywright? _playwright;
 
-    public VfsAppointmentsService(IOptions<VfsSettings> settings)
+    public VfsAppointmentsService(IOptions<VfsSettings> vfsSettings, IOptions<JobSettings> jobSettings)
     {
-        _settings = settings.Value;
+        _jobSettings = jobSettings.Value;
+        _vfsSettings = vfsSettings.Value;
     }
 
     private async Task<IBrowser> GetBrowser()
@@ -19,7 +21,7 @@ public class VfsAppointmentsService : IAppointmentsService
         _playwright = await Playwright.CreateAsync();
         var browser = await _playwright.Chromium.LaunchAsync(new()
         {
-            Headless = false
+            Headless = _jobSettings.Headless,
         });
         return browser;
     }
@@ -28,7 +30,8 @@ public class VfsAppointmentsService : IAppointmentsService
     {
         var slots = new Dictionary<string, string>();
         var browser = await GetBrowser();
-        var context = await browser.NewContextAsync();
+        var desktop = _playwright?.Devices["Desktop Chrome"];
+        var context = await browser.NewContextAsync(desktop);
         var page = await context.NewPageAsync();
 
         await Authenticate(page);
@@ -41,8 +44,9 @@ public class VfsAppointmentsService : IAppointmentsService
         await SelectManchesterTouristVisa(page);
         slots.Add(VfsSettings.Manchester, await GetSlotsFromPage(page));
 
+        await context.DisposeAsync();
         await browser.DisposeAsync();
-        _playwright.Dispose();
+        _playwright?.Dispose();
 
         bool found = IsAppointmentAvailable(slots);
         return (found, slots);
@@ -54,7 +58,7 @@ public class VfsAppointmentsService : IAppointmentsService
     private async Task<string> GetSlotsFromPage(IPage page)
     {
         var text = await page.Locator(".alert.alert-info").TextContentAsync();
-        return text;
+        return text ?? string.Empty;
     }
 
     private static async Task SelectManchesterTouristVisa(IPage page)
@@ -75,7 +79,7 @@ public class VfsAppointmentsService : IAppointmentsService
         await page.Locator("#mat-select-value-1").ClickAsync();
 
         await page.GetByText("Italy Visa Application Centre, London").ClickAsync();
-        
+
         await page.Locator("div")
             .Filter(new LocatorFilterOptions { HasText = "Select your appointment category" })
             .Nth(2)
@@ -94,11 +98,13 @@ public class VfsAppointmentsService : IAppointmentsService
 
     private async Task Authenticate(IPage page)
     {
-        await page.GotoAsync(_settings.Urls.Authentication);
+        await page.GotoAsync(_vfsSettings.Urls.Authentication);
 
-        await page.GetByPlaceholder("jane.doe@email.com").FillAsync(_settings.Account.Email);
+        await page.Locator("input[formcontrolname=\"username\"]").FillAsync(_vfsSettings.Account.Email);
+        //await page.GetByPlaceholder("jane.doe@email.com").FillAsync(_vfsSettings.Account.Email);
 
-        await page.GetByPlaceholder("**********").FillAsync(_settings.Account.Password);
+        await page.Locator("input[formcontrolname=\"password\"]").FillAsync(_vfsSettings.Account.Password);
+        //await page.GetByPlaceholder("**********").FillAsync(_vfsSettings.Account.Password);
 
         await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Sign In" }).ClickAsync();
     }

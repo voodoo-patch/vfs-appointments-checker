@@ -1,33 +1,36 @@
-﻿using Quartz;
+﻿using Microsoft.Extensions.Options;
+using Quartz;
+using System.Configuration;
+using TimedChecker.Job.Configuration;
 
 namespace TimedChecker.Job.DI;
 
 public static class QuartzDI
 {
-    public static void AddQuartzJob(this IServiceCollection services)
-    {
+    public static IServiceCollection AddQuartzJob(this IServiceCollection services,
+        IConfiguration hostContextConfiguration) =>
         services.AddQuartz(q =>
         {
+            var settings = new JobSettings();
+            hostContextConfiguration.GetSection(nameof(JobSettings)).Bind(settings);
+
             q.UseMicrosoftDependencyInjectionJobFactory();
             var jobKey = new JobKey(nameof(AppointmentCheckerJob));
             q.AddJob<AppointmentCheckerJob>(opts => opts.WithIdentity(jobKey));
 
             q.AddTrigger(opts => opts
                 .ForJob(jobKey)
-                .WithCronSchedule("0 5/30 6-21 ? * 2-6"));
+                .WithCronSchedule(settings.CronSchedule));
 
-            #if DEBUG
-            q.AddTrigger(opts => opts
-                .ForJob(jobKey)
-                .WithSimpleSchedule());
-            #endif
-        });
-
-        // Quartz.Extensions.Hosting hosting
-        services.AddQuartzHostedService(options =>
+            if (settings.RunOnStartup)
+            {
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithSimpleSchedule());
+            }
+        }).AddQuartzHostedService(options =>
         {
             // when shutting down we want jobs to complete gracefully
             options.WaitForJobsToComplete = true;
         });
-    }
 }

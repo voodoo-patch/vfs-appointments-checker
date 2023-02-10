@@ -4,16 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TimedChecker.Job.Configuration;
 
-public record TelegramSettings
+public record TelegramSettings(string BotId, IEnumerable<string> Channels)
 {
-    public TelegramSettings() { }
-    public TelegramSettings(string BotId, IEnumerable<string> Channels)
-    {
-        this.BotId = BotId;
-        this.Channels = Channels;
-    }
-
-    public string BotId { get; init; }
-    public IEnumerable<string> Channels { get; init; }
-
+    public TelegramSettings() : this (string.Empty, new List<string>()){}
 }

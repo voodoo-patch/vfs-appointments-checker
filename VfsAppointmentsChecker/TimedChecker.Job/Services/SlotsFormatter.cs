@@ -9,6 +9,6 @@ public class SlotsFormatter
     {
         string appointments = string.Join("\n",
             slots.Select(centre => centre.Key + ": " + centre.Value));
-        return $"Found new appointments:\n{appointments}";
+        return $":tada: **Found new appointments!!**:\n{appointments}";
     }
 }

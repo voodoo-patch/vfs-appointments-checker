@@ -4,13 +4,14 @@ namespace TimedChecker.Tests;
 public class SlotsFormatterTests
 {
     private readonly SlotsFormatter _sut;
-    private readonly IDictionary<string, IEnumerable<string>> _validSlots = new Dictionary<string, IEnumerable<string>>()
+    private static readonly IDictionary<string, string> _slots = new Dictionary<string, string>()
     {
-        { "LONDON", new List<string> { "14:00", "15:30"} },
-        { "MANCHESTER", new List<string> { "10:15"} }
+        { "LONDON", "Earliest appointment found on 1/1/1970 at 14:00" },
+        { "MANCHESTER", "Earliest appointment found on 1/1/1970 at 10:15" }
     };
-
-    private readonly string _expectedString = $"Found 3 new appointments:\nLONDON: 14:00, 15:30\nMANCHESTER: 10:15";
+    private readonly string _expectedString = $":tada: **Found new appointments!!**:\n" +
+                                                    $"{_slots.ElementAt(0).Key}: {_slots.ElementAt(0).Value}\n" +
+                                                    $"{_slots.ElementAt(1).Key}: {_slots.ElementAt(1).Value}";
 
     public SlotsFormatterTests()
     {
@@ -20,7 +21,7 @@ public class SlotsFormatterTests
     [Fact]
     public void Format_GivenValidSlots_ReturnsString()
     {
-        var result = _sut.Format(_validSlots);
+        var result = _sut.Format(_slots);
 
         result.Should().NotBeEmpty().And.BeEquivalentTo(_expectedString);
     }

@@ -24,12 +24,11 @@ public class AppointmentCheckerJob : IJob
         _slotsFormatter = slotsFormatter;
     }
     
-    public async Task Execute(IJobExecutionContext context)
-    {
-        await CheckAppointmentsAndNotify();
-    }
+    public async Task Execute(IJobExecutionContext context) => await CheckAppointmentsAndNotify();
+
     private async Task CheckAppointmentsAndNotify()
     {
+        _logger.LogInformation($"{DateTime.UtcNow} - Checking for new appointments");
         var (found, slots) = await _appointmentsService.GetSlots();
         if (found)
         {

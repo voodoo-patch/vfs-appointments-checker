@@ -28,7 +28,6 @@ namespace TimedChecker.Tests
         private Mock<IRecipientsProvider> GetRecipientsProviderMock()
         {
             Mock<IRecipientsProvider> recipientsProviderMock = new Mock<IRecipientsProvider>();
-            // ISSUE: method reference
             recipientsProviderMock.Setup(_ => _.GetRecipients())
                 .Returns(Task.FromResult(_recipients));
             return recipientsProviderMock;
