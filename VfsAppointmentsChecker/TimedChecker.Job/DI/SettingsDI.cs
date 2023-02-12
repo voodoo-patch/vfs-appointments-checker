@@ -16,21 +16,4 @@ public static class SettingsDI
             .Configure<JobSettings>(
                 hostContextConfiguration.GetSection(nameof(JobSettings))
             );
-    //services.AddOptions<TelegramSettings>()
-    //    .Configure<IConfiguration>((settings, configuration) =>
-    //    {
-    //        configuration.GetSection(nameof(TelegramSettings)).Bind(settings);
-    //    });
-    //services.AddOptions<VfsSettings>()
-    //    .Configure<IConfiguration>((settings, configuration) =>
-    //    {
-    //        configuration.GetSection(nameof(VfsSettings)).Bind(settings);
-    //    });
-    //services.AddOptions<JobSettings>()
-    //    .Configure<IConfiguration>((settings, configuration) =>
-    //    {
-    //        configuration.GetSection(nameof(JobSettings)).Bind(settings);
-    //    });
-    //return services;
-    //}
 }

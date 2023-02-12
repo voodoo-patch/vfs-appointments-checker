@@ -1,4 +1,3 @@
-using System.Configuration;
 using TimedChecker.Job.DI;
 using TimedChecker.Job.Services;
 
