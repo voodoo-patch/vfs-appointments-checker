@@ -15,12 +15,13 @@ public static class QuartzDI
             hostContextConfiguration.GetSection(nameof(JobSettings)).Bind(settings);
 
             q.UseMicrosoftDependencyInjectionJobFactory();
-            var jobKey = new JobKey(nameof(AppointmentCheckerJob));
+            var jobKey = new JobKey(AppointmentCheckerJob.Key);
             q.AddJob<AppointmentCheckerJob>(opts => opts.WithIdentity(jobKey));
 
             q.AddTrigger(opts => opts
                 .ForJob(jobKey)
-                .WithCronSchedule(settings.CronSchedule));
+                .WithCronSchedule(settings.CronSchedule,
+                    _ => _.WithMisfireHandlingInstructionDoNothing()));
 
             if (settings.RunOnStartup)
             {

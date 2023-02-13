@@ -23,6 +23,8 @@ public class AppointmentCheckerJob : IJob
         _appointmentsService = appointmentsService;
         _slotsFormatter = slotsFormatter;
     }
+
+    public const string Key = nameof(AppointmentCheckerJob);
     
     public async Task Execute(IJobExecutionContext context) => await CheckAppointmentsAndNotify();
 
