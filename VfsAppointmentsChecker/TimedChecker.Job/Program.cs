@@ -1,17 +1,18 @@
 using TimedChecker.Job.DI;
 using TimedChecker.Job.Services;
 
-IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) =>
-        services
-            .AddHttpClient()
-            .AddSettings(hostContext.Configuration)
-            .AddQuartzJob(hostContext.Configuration)
-            .AddSingleton<INotifierService, TelegramNotifierService>()
-            .AddSingleton<IRecipientsProvider, TelegramRecipientsProvider>()
-            .AddSingleton<IAppointmentsService, VfsAppointmentsService>()
-            .AddSingleton<SlotsFormatter>()
-    )
-    .Build();
+var builder = WebApplication.CreateBuilder(args);
 
-host.Run();
+builder.Services
+    .AddHttpClient()
+    .AddSettings(builder.Configuration)
+    .AddQuartzJob(builder.Configuration)
+    .AddSingleton<INotifierService, TelegramNotifierService>()
+    .AddSingleton<IRecipientsProvider, TelegramRecipientsProvider>()
+    .AddSingleton<IAppointmentsService, VfsAppointmentsService>()
+    .AddSingleton<SlotsFormatter>();
+
+var app = builder.Build();
+
+app.MapEndpoints();
+app.Run();
