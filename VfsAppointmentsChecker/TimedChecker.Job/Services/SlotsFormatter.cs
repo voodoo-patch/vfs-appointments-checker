@@ -7,7 +7,7 @@ public class SlotsFormatter
 {
     public string Format(IDictionary<string, string> slots)
     {
-        string appointments = string.Join("\n\n",
+        var appointments = string.Join("\n\n",
             slots.Select(centre => $"*{centre.Key}*: {centre.Value}"));
         return $"🎉 *Found new appointments!!*\n\n{appointments}";
     }

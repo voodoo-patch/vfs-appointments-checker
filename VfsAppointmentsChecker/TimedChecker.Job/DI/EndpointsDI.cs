@@ -13,7 +13,7 @@ public static class EndpointsDI
     }
 
     private static readonly Delegate TriggerHandler =
-         (IJobExecutionService jobExecutionService) => jobExecutionService.Trigger();
+        (IJobExecutionService jobExecutionService) => jobExecutionService.Trigger();
 
     private static readonly Delegate StopHandler =
         (IJobExecutionService jobExecutionService) => jobExecutionService.Stop();

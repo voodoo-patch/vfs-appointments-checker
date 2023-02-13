@@ -4,7 +4,7 @@ public static class SwaggerDI
 {
     public static void EnableSwagger(this WebApplication app)
     {
-        Boolean.TryParse(app.Configuration["EnableSwagger"], out bool enabled);
+        bool.TryParse(app.Configuration["EnableSwagger"], out var enabled);
         if (enabled)
         {
             app.UseSwagger();

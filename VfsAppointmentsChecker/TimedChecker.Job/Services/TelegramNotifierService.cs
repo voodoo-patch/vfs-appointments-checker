@@ -25,19 +25,19 @@ public class TelegramNotifierService : INotifierService
     {
         foreach (var chatId in recipients)
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>
-                {
-                    { "parse_mode", DefaultParseMode },
-                    { "chat_id", chatId },
-                    { "text", message }
-                };
+            var dictionary = new Dictionary<string, string>
+            {
+                {"parse_mode", DefaultParseMode},
+                {"chat_id", chatId},
+                {"text", message}
+            };
 
-            string json = JsonConvert.SerializeObject(dictionary);
+            var json = JsonConvert.SerializeObject(dictionary);
             var requestData = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"{_configuration.BotApiEndpoint}{_configuration.BotId}/sendMessage", requestData);
+            var response = await _client.PostAsync($"{_configuration.BotApiEndpoint}{_configuration.BotId}/sendMessage",
+                requestData);
             var result = await response.Content.ReadAsStringAsync();
         }
     }
-
 }
