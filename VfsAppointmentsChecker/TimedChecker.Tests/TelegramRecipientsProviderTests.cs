@@ -18,7 +18,7 @@ namespace TimedChecker.Tests
         {
             Mock<IOptions<TelegramSettings>> configurationMock = new Mock<IOptions<TelegramSettings>>();
             configurationMock.Setup(_ => _.Value)
-                .Returns(() => new TelegramSettings(null, _recipients));
+                .Returns(() => new TelegramSettings(string.Empty, string.Empty, _recipients));
             return configurationMock;
         }
 

@@ -9,9 +9,7 @@ namespace TimedChecker.Tests
     public class TelegramNotifierServiceTests
     {
         private readonly TelegramNotifierService _sut;
-        private readonly IEnumerable<string> _recipients = new List<string>{ "channel-id-1"
-    };
-        private readonly string _botId = "my-bot-id";
+        private readonly IEnumerable<string> _recipients = new List<string> { "channel-id-1" };
 
         public TelegramNotifierServiceTests() =>
             _sut = new TelegramNotifierService(GetIHttpClientMock().Object, GetRecipientsProviderMock().Object,
@@ -21,7 +19,7 @@ namespace TimedChecker.Tests
         {
             Mock<IOptions<TelegramSettings>> configurationMock = new Mock<IOptions<TelegramSettings>>();
             configurationMock.Setup(_ => _.Value)
-                .Returns(() => new TelegramSettings(_botId, _recipients));
+                .Returns(() => new TelegramSettings(string.Empty, string.Empty, _recipients));
             return configurationMock;
         }
 
