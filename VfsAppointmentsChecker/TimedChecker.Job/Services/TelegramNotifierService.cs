@@ -7,6 +7,7 @@ namespace TimedChecker.Job.Services;
 
 public class TelegramNotifierService : INotifierService
 {
+    private const string DefaultParseMode = "markdown";
     private readonly IRecipientsProvider _recipientsProvider;
     private readonly TelegramSettings _configuration;
     private readonly HttpClient _client;
@@ -26,6 +27,7 @@ public class TelegramNotifierService : INotifierService
         {
             Dictionary<string, string> dictionary = new Dictionary<string, string>
                 {
+                    { "parse_mode", DefaultParseMode },
                     { "chat_id", chatId },
                     { "text", message }
                 };
@@ -33,8 +35,9 @@ public class TelegramNotifierService : INotifierService
             string json = JsonConvert.SerializeObject(dictionary);
             var requestData = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"https://api.telegram.org/bot{_configuration.BotId}/sendMessage", requestData);
+            var response = await _client.PostAsync($"{_configuration.BotApiEndpoint}{_configuration.BotId}/sendMessage", requestData);
             var result = await response.Content.ReadAsStringAsync();
         }
     }
+
 }

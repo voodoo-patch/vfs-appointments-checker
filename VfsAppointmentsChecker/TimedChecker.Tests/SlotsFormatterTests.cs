@@ -9,9 +9,9 @@ public class SlotsFormatterTests
         { "LONDON", "Earliest appointment found on 1/1/1970 at 14:00" },
         { "MANCHESTER", "Earliest appointment found on 1/1/1970 at 10:15" }
     };
-    private readonly string _expectedString = $":tada: **Found new appointments!!**:\n" +
-                                                    $"{_slots.ElementAt(0).Key}: {_slots.ElementAt(0).Value}\n" +
-                                                    $"{_slots.ElementAt(1).Key}: {_slots.ElementAt(1).Value}";
+    private readonly string _expectedString = "🎉 *Found new appointments!!*\n\n" +
+                                                    $"*{_slots.ElementAt(0).Key}*: {_slots.ElementAt(0).Value}\n\n" +
+                                                    $"*{_slots.ElementAt(1).Key}*: {_slots.ElementAt(1).Value}";
 
     public SlotsFormatterTests()
     {
