@@ -11,9 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		..\.gitignore = ..\.gitignore
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimedChecker.Bot", "TimedChecker.Bot\TimedChecker.Bot.csproj", "{04960C14-5537-4B10-B1F7-EF32C27AF3F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimedChecker.Bot", "TimedChecker.Bot\TimedChecker.Bot.csproj", "{04960C14-5537-4B10-B1F7-EF32C27AF3F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
