@@ -1,40 +1,47 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TimedChecker.Bot.Handlers;
 
 public class TelegramBotUpdatesHandler
 {
-    public TelegramBotUpdatesHandler()
+    private readonly ILogger _logger;
+    private readonly ITelegramBotCommandHandler _commandHandler;
+    private readonly string _defaultReplyToUnsupportedCommand = "I can help you managing the Vfs appointments checker!\n\n" +
+                                                            "You can control me by sending these commands:\n" +
+                                                            $"{BotCommands.GetCommandsAsString()}";
+    
+    public TelegramBotUpdatesHandler(ILogger<TelegramBotUpdatesHandler> logger, ITelegramBotCommandHandler commandHandler)
     {
+        _logger = logger;
+        _commandHandler = commandHandler;
     }
 
     public async Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         // Only process Message updates: https://core.telegram.org/bots/api#message
-        if (update.Message is not { } message)
-            return;
-        // Only process text messages
-        if (message.Text is not { } messageText)
+        if (update.Message is not { Text: { } messageText } message)
             return;
 
         var chatId = message.Chat.Id;
 
-        Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
+        _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
 
-        ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-        {
-            new KeyboardButton[] {"Help me", "Call me ☎️"}
-        })
-        {
-            ResizeKeyboard = true
-        };
-        // Echo received message text
-        var sentMessage = await botClient.SendTextMessageAsync(
+        string reply = await getReply(messageText);
+
+        await botClient.SendTextMessageAsync(
             chatId,
-            "You said:\n" + messageText,
-            replyMarkup: replyKeyboardMarkup,
+            reply,
             cancellationToken: cancellationToken);
     }
+
+    private async Task<string> getReply(string messageText) =>
+        messageText switch
+        {
+            BotCommands.Check => await _commandHandler.HandleCheckAsync(),
+            BotCommands.Pause => await _commandHandler.HandlePauseAsync(),
+            BotCommands.Resume => await _commandHandler.HandleResumeAsync(),
+            _ => _defaultReplyToUnsupportedCommand
+        };
 }

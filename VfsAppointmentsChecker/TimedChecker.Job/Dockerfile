@@ -13,7 +13,6 @@ RUN dotnet restore --use-current-runtime
 
 # copy everything else and build app
 COPY ./. .
-RUN mv -f appsettings.local.json appsettings.json
 
 # publish
 RUN dotnet publish \

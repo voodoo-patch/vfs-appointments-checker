@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/microsoft-dotnet
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 
 WORKDIR /source
 
@@ -9,7 +9,6 @@ RUN dotnet restore --use-current-runtime
 
 # copy everything else and build app
 COPY ./. .
-RUN mv -f appsettings.local.json appsettings.json
 
 # publish
 RUN dotnet publish \

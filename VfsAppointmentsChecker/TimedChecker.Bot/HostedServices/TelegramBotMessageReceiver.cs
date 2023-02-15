@@ -10,26 +10,20 @@ namespace TimedChecker.Bot.HostedServices;
 
 public class TelegramBotMessageReceiver : BackgroundService
 {
-    private readonly IHost _host;
     private readonly TelegramBotClient _botClient;
     private readonly TelegramBotUpdatesHandler _telegramBotUpdatesHandler;
     private readonly TelegramBotErrorHandler _telegramBotErrorHandler;
 
-    public TelegramBotMessageReceiver(IHost host,
+    public TelegramBotMessageReceiver(
         IOptions<TelegramSettings> settingsOptions,
         TelegramBotUpdatesHandler telegramBotUpdatesHandler)
     {
-        _host = host;
         _botClient = new TelegramBotClient(settingsOptions.Value.BotId);
         _telegramBotUpdatesHandler = telegramBotUpdatesHandler;
         _telegramBotErrorHandler = new TelegramBotErrorHandler();
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        await ReceiveMessage();
-        await _host.StopAsync(stoppingToken);
-    }
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken) => await ReceiveMessage();
 
     private async Task ReceiveMessage()
     {
@@ -51,9 +45,5 @@ public class TelegramBotMessageReceiver : BackgroundService
         var me = await _botClient.GetMeAsync();
 
         Console.WriteLine($"Start listening for @{me.Username}");
-        Console.ReadLine();
-
-        // Send cancellation request to stop bot
-        cts.Cancel();
     }
 }

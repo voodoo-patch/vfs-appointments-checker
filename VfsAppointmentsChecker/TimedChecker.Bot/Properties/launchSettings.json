@@ -3,7 +3,7 @@
     "TimedChecker.Bot": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local"
+        "DOTNET_ENVIRONMENT": "local"
       }
     }
   }

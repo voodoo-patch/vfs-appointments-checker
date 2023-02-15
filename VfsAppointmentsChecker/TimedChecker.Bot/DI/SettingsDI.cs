@@ -12,6 +12,9 @@ public static class SettingsDI
         return services
             .Configure<TelegramSettings>(
                 hostContextConfiguration.GetSection(nameof(TelegramSettings))
+            )
+            .Configure<AppointmentCheckerSettings>(
+                hostContextConfiguration.GetSection(nameof(AppointmentCheckerSettings))
             );
     }
 }
