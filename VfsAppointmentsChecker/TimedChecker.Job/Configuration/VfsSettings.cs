@@ -3,9 +3,9 @@ using static TimedChecker.Job.Configuration.VfsSettings;
 
 namespace TimedChecker.Job.Configuration;
 
-public record VfsSettings(AccountSettings Account, UrlsSettings Urls)
+public record VfsSettings(IEnumerable<AccountSettings> Accounts, UrlsSettings Urls)
 {
-    public VfsSettings() : this(new AccountSettings(string.Empty, string.Empty), new UrlsSettings(string.Empty))
+    public VfsSettings() : this(new List<AccountSettings>(), new UrlsSettings(string.Empty))
     {
     }
 

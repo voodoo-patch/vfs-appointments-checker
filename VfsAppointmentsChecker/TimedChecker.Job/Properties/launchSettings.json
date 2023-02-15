@@ -5,8 +5,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local",
-        "VfsSettings__Account__Email": "stocavolo"
+        "ASPNETCORE_ENVIRONMENT": "local"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5109"

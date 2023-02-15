@@ -107,9 +107,9 @@ TelegramSettings__BotApiEndpoint=https://api.telegram.org/bot
 TelegramSettings__BotId={my-bot-id}
 TelegramSettings__Channels__0={my-tg-channel}
 
-VfsSettings__Account__Email={my-vfs-email}
-VfsSettings__Account__Password={my-vfs-pw}
-VfsSettings__Urls__Authentication=https://visa.vfsglobal.com/gbr/en/ita/login
+VfsSettings__Accounts__0__Email={my-vfs-email}
+VfsSettings__Accounts__0__Password={my-vfs-pw}
+VfsSettings__Urls__Authentication={vfs-auth-page}
 
 JobSettings__CronSchedule={my-CRON-expression}
 JobSettings__RunOnStartup=false
