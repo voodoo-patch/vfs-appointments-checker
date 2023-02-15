@@ -17,7 +17,7 @@ public class QuartzJobExecutionService : IJobExecutionService
     public async Task Trigger()
     {
         var scheduler = await _schedulerFactory.GetScheduler();
-        if (!scheduler.InStandbyMode) await scheduler.TriggerJob(_jobKey);
+        await scheduler.TriggerJob(_jobKey);
     }
 
     public async Task Start()
