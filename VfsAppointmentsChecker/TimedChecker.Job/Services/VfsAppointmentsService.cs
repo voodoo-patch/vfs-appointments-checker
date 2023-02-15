@@ -6,12 +6,14 @@ namespace TimedChecker.Job.Services;
 
 public class VfsAppointmentsService : IAppointmentsService
 {
+    private readonly ICredentialsProvider _credentialsProvider;
     private readonly JobSettings _jobSettings;
     private readonly VfsSettings _vfsSettings;
     private IPlaywright? _playwright;
 
-    public VfsAppointmentsService(IOptions<VfsSettings> vfsSettings, IOptions<JobSettings> jobSettings)
+    public VfsAppointmentsService(IOptions<VfsSettings> vfsSettings, IOptions<JobSettings> jobSettings, ICredentialsProvider credentialsProvider)
     {
+        _credentialsProvider = credentialsProvider;
         _jobSettings = jobSettings.Value;
         _vfsSettings = vfsSettings.Value;
     }
@@ -100,13 +102,12 @@ public class VfsAppointmentsService : IAppointmentsService
 
     private async Task Authenticate(IPage page)
     {
+        var account = await _credentialsProvider.GetAccountAsync();
+
         await page.GotoAsync(_vfsSettings.Urls.Authentication);
 
-        await page.Locator("input[formcontrolname=\"username\"]").FillAsync(_vfsSettings.Account.Email);
-        //await page.GetByPlaceholder("jane.doe@email.com").FillAsync(_vfsSettings.Account.Email);
-
-        await page.Locator("input[formcontrolname=\"password\"]").FillAsync(_vfsSettings.Account.Password);
-        //await page.GetByPlaceholder("**********").FillAsync(_vfsSettings.Account.Password);
+        await page.Locator("input[formcontrolname=\"username\"]").FillAsync(account.Email);
+        await page.Locator("input[formcontrolname=\"password\"]").FillAsync(account.Password);
 
         await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions {Name = "Sign In"}).ClickAsync();
     }
