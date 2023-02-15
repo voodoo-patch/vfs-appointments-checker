@@ -19,9 +19,9 @@ public class VfsAppointmentsService : IAppointmentsService
     private async Task<IBrowser> GetBrowser()
     {
         _playwright = await Playwright.CreateAsync();
-        var browser = await _playwright.Chromium.LaunchAsync(new()
+        var browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = _jobSettings.Headless,
+            Headless = _jobSettings.Headless
         });
         return browser;
     }
@@ -36,7 +36,7 @@ public class VfsAppointmentsService : IAppointmentsService
 
         await Authenticate(page);
 
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Start New Booking" }).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions {Name = "Start New Booking"}).ClickAsync();
 
         await SelectLondonTouristVisa(page);
         slots.Add(VfsSettings.London, await GetSlotsFromPage(page));
@@ -48,12 +48,14 @@ public class VfsAppointmentsService : IAppointmentsService
         await browser.DisposeAsync();
         _playwright?.Dispose();
 
-        bool found = IsAppointmentAvailable(slots);
+        var found = IsAppointmentAvailable(slots);
         return (found, slots);
     }
 
-    private bool IsAppointmentAvailable(Dictionary<string, string> slots) =>
-        slots.Values.Any(_ => !_.Contains("No appointment"));
+    private bool IsAppointmentAvailable(Dictionary<string, string> slots)
+    {
+        return slots.Values.Any(_ => !_.Contains("No appointment"));
+    }
 
     private async Task<string> GetSlotsFromPage(IPage page)
     {
@@ -71,7 +73,7 @@ public class VfsAppointmentsService : IAppointmentsService
 
         await page.Locator("#mat-select-value-5").ClickAsync();
 
-        await page.GetByText("Tourist", new PageGetByTextOptions { Exact = true }).ClickAsync();
+        await page.GetByText("Tourist", new PageGetByTextOptions {Exact = true}).ClickAsync();
     }
 
     private static async Task SelectLondonTouristVisa(IPage page)
@@ -81,7 +83,7 @@ public class VfsAppointmentsService : IAppointmentsService
         await page.GetByText("Italy Visa Application Centre, London").ClickAsync();
 
         await page.Locator("div")
-            .Filter(new LocatorFilterOptions { HasText = "Select your appointment category" })
+            .Filter(new LocatorFilterOptions {HasText = "Select your appointment category"})
             .Nth(2)
             .ClickAsync();
 
@@ -106,6 +108,6 @@ public class VfsAppointmentsService : IAppointmentsService
         await page.Locator("input[formcontrolname=\"password\"]").FillAsync(_vfsSettings.Account.Password);
         //await page.GetByPlaceholder("**********").FillAsync(_vfsSettings.Account.Password);
 
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Sign In" }).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions {Name = "Sign In"}).ClickAsync();
     }
 }

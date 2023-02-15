@@ -23,26 +23,27 @@ public class AppointmentCheckerJob : IJob
         _appointmentsService = appointmentsService;
         _slotsFormatter = slotsFormatter;
     }
-    
-    public async Task Execute(IJobExecutionContext context) => await CheckAppointmentsAndNotify();
+
+    public const string Key = nameof(AppointmentCheckerJob);
+
+    public async Task Execute(IJobExecutionContext context)
+    {
+        await CheckAppointmentsAndNotify();
+    }
 
     private async Task CheckAppointmentsAndNotify()
     {
         _logger.LogInformation($"{DateTime.UtcNow} - Checking for new appointments");
         var (found, slots) = await _appointmentsService.GetSlots();
         if (found)
-        {
             await NotifySuccess(slots);
-        }
         else
-        {
             _logger.LogInformation($"{DateTime.UtcNow} - No appointments found");
-        }
     }
 
     private async Task NotifySuccess(IDictionary<string, string> slots)
     {
-        string message = _slotsFormatter.Format(slots);
+        var message = _slotsFormatter.Format(slots);
         _logger.LogInformation(message);
 
         var chatIds = await _recipientsProvider.GetRecipients();

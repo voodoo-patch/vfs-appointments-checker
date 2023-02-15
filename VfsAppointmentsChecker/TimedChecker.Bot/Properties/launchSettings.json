@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TimedChecker.Bot": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "local"
+      }
+    }
+  }
+}

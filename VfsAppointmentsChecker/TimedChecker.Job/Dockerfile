@@ -13,7 +13,6 @@ RUN dotnet restore --use-current-runtime
 
 # copy everything else and build app
 COPY ./. .
-RUN mv -f appsettings.local.json appsettings.json
 
 # publish
 RUN dotnet publish \
@@ -28,7 +27,10 @@ RUN dotnet tool install --global Microsoft.Playwright.CLI
 ENV PATH="$PATH:/root/.dotnet/tools/"
 RUN playwright install --with-deps chromium 
 
-FROM mcr.microsoft.com/playwright:v1.30.0-focal
+FROM mcr.microsoft.com/playwright:v1.30.0-focal as final
+
+EXPOSE 80
+EXPOSE 443
 
 WORKDIR /app
 COPY --from=build /app .

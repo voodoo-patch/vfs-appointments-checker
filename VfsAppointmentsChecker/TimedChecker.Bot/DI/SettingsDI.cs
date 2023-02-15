@@ -1,6 +1,8 @@
-﻿using TimedChecker.Job.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using TimedChecker.Bot.Configuration;
 
-namespace TimedChecker.Job.DI;
+namespace TimedChecker.Bot.DI;
 
 public static class SettingsDI
 {
@@ -11,11 +13,8 @@ public static class SettingsDI
             .Configure<TelegramSettings>(
                 hostContextConfiguration.GetSection(nameof(TelegramSettings))
             )
-            .Configure<VfsSettings>(
-                hostContextConfiguration.GetSection(nameof(VfsSettings))
-            )
-            .Configure<JobSettings>(
-                hostContextConfiguration.GetSection(nameof(JobSettings))
+            .Configure<AppointmentCheckerSettings>(
+                hostContextConfiguration.GetSection(nameof(AppointmentCheckerSettings))
             );
     }
 }
