@@ -4,6 +4,11 @@ This project is comprised of two main components:
 - A CRON scheduled Job in charge of checking for appointments
 - A Telegram Bot that offers a user friendly way of remotely control the Job through its APIs
 
+The Job leverages Playwright to simulate user interaction with the VFS website and sends a message to a Telegram Bot in a specified channel when a new appointment is available.
+
+
+
+
 ## Build Docker Images
 
 ```sh
@@ -27,7 +32,7 @@ To configure the containers you can use environment variables (dotenv files) sup
 docker run \
   -d \
   --restart unless-stopped \
-  --env-file ./local.env/vfs-checker-bot.env \
+  --env-file ./vfs-checker-bot.env \
   vfs-checker-bot:latest
 ```
 
@@ -41,9 +46,9 @@ docker run \
   vfs-checker:latest
 ```
 
-## TimedChecker.Bot
+# TimedChecker.Bot
 
-### Configuration
+## Configuration
 
 ```dotenv
 TelegramSettings__BotId={my-bot-id}
@@ -60,9 +65,39 @@ AppointmentCheckerSettings__Resume__Method=POST
 AppointmentCheckerSettings__Resume__Path=start
 ```
 
-## TimedChecker.Job
+# TimedChecker.Job
 
-### Configuration
+## APIs
+
+### /trigger
+
+#### POST
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+
+### /start
+
+#### POST
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+
+### /stop
+
+#### POST
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+
+
+## Configuration
 
 ```dotenv
 ASPNETCORE_URLS=http://+:80
