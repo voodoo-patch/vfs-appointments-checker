@@ -1,0 +1,32 @@
+version: '3.8'
+name: vfs-checker
+services:
+  bot:
+    build:
+      context: ./src/TimedChecker.Bot
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6000:8080"
+    environment:
+      - TelegramSettings__BotToken=${TELEGRAM_BOT_TOKEN}
+      - AppointmentCheckerSettings__ApiBaseLocation=job:80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 2m
+
+
+  job:
+    build:
+      context: ./src/TimedChecker.Job
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=VfsChecker;User Id=sa;Password=Password123!
+      - VFS_CHECKER_BOT_TOKEN=your_token

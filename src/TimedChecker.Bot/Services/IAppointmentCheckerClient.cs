@@ -1,6 +1,6 @@
 ﻿namespace TimedChecker.Bot.Services;
 
-public interface IAppointmentChecker
+public interface IAppointmentCheckerClient
 {
     Task CheckAsync();
     Task PauseAsync();

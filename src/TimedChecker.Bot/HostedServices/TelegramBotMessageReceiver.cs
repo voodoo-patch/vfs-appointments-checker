@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -8,27 +8,20 @@ using TimedChecker.Bot.Handlers;
 
 namespace TimedChecker.Bot.HostedServices;
 
-public class TelegramBotMessageReceiver : BackgroundService
+public class TelegramBotMessageReceiver(
+    ILogger<TelegramBotMessageReceiver> logger,
+    IOptions<TelegramSettings> settingsOptions,
+    TelegramBotUpdatesHandler telegramBotUpdatesHandler)
+    : BackgroundService, IHealthCheck
 {
-    private readonly TelegramBotClient _botClient;
-    private readonly TelegramBotUpdatesHandler _telegramBotUpdatesHandler;
-    private readonly TelegramBotErrorHandler _telegramBotErrorHandler;
+    private readonly TelegramBotClient _botClient = new(settingsOptions.Value.BotToken);
+    private readonly TelegramBotErrorHandler _telegramBotErrorHandler = new();
 
-    public TelegramBotMessageReceiver(
-        IOptions<TelegramSettings> settingsOptions,
-        TelegramBotUpdatesHandler telegramBotUpdatesHandler)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken) =>
+        await ReceiveMessage(stoppingToken);
+
+    private async Task ReceiveMessage(CancellationToken stoppingToken)
     {
-        _botClient = new TelegramBotClient(settingsOptions.Value.BotId);
-        _telegramBotUpdatesHandler = telegramBotUpdatesHandler;
-        _telegramBotErrorHandler = new TelegramBotErrorHandler();
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken) => await ReceiveMessage();
-
-    private async Task ReceiveMessage()
-    {
-        using CancellationTokenSource cts = new();
-
         // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
         ReceiverOptions receiverOptions = new()
         {
@@ -36,14 +29,31 @@ public class TelegramBotMessageReceiver : BackgroundService
         };
 
         _botClient.StartReceiving(
-            _telegramBotUpdatesHandler.HandleAsync,
+            telegramBotUpdatesHandler.HandleAsync,
             _telegramBotErrorHandler.HandleAsync,
             receiverOptions,
-            cts.Token
+            stoppingToken
         );
 
-        var me = await _botClient.GetMeAsync();
+        var me = await _botClient.GetMeAsync(stoppingToken);
 
-        Console.WriteLine($"Start listening for @{me.Username}");
+        logger.LogInformation($"Start listening for @{me.Username}");
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = new())
+    {
+        try
+        {
+            _ = await _botClient.GetMeAsync(cancellationToken);
+
+            return HealthCheckResult.Healthy();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Telegram Bot is unhealthy");
+            return HealthCheckResult.Unhealthy(e.Message);
+        }
     }
 }

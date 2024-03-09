@@ -4,20 +4,20 @@ namespace TimedChecker.Bot.Handlers;
 
 public class TelegramBotCommandHandler : ITelegramBotCommandHandler
 {
-    private readonly IAppointmentChecker _appointmentChecker;
+    private readonly IAppointmentCheckerClient _appointmentCheckerClient;
     private readonly string _defaultReplyToError = "I'm struggling to contact the Appointment Checker 😣\n" +
                                                    "Try again later.";
 
-    public TelegramBotCommandHandler(IAppointmentChecker appointmentChecker)
+    public TelegramBotCommandHandler(IAppointmentCheckerClient appointmentCheckerClient)
     {
-        _appointmentChecker = appointmentChecker;
+        _appointmentCheckerClient = appointmentCheckerClient;
     }
 
     public async Task<string> HandleCheckAsync()
     {
         try
         {
-            await _appointmentChecker.CheckAsync();
+            await _appointmentCheckerClient.CheckAsync();
             return $"Checking for new appointments...\n" +
                    $"If any available I will notify You 🤞";
         }
@@ -31,8 +31,8 @@ public class TelegramBotCommandHandler : ITelegramBotCommandHandler
     {
         try
         {
-            await _appointmentChecker.PauseAsync();
-            return $"Ok! Just tell me when You want me to {BotCommands.Resume} checking 😉";
+            await _appointmentCheckerClient.PauseAsync();
+            return $"Ok! Just tell me when You want me to {BotCommands.ResumeRoute} checking 😉";
         }
         catch (Exception)
         {
@@ -44,9 +44,9 @@ public class TelegramBotCommandHandler : ITelegramBotCommandHandler
     {
         try
         {
-            await _appointmentChecker.ResumeAsync();
+            await _appointmentCheckerClient.ResumeAsync();
             return $"Gotcha! Checking will start at the next scheduled time ⏰.\n" +
-                   $"If You want to {BotCommands.Check} now itself just tell me.\n" +
+                   $"If You want to {BotCommands.CheckRoute} now itself just tell me.\n" +
                    $"If any available I will notify You 🤞";
         }
         catch (Exception)

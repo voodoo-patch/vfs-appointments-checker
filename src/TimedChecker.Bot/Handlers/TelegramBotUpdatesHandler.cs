@@ -8,17 +8,24 @@ public class TelegramBotUpdatesHandler
 {
     private readonly ILogger _logger;
     private readonly ITelegramBotCommandHandler _commandHandler;
-    private readonly string _defaultReplyToUnsupportedCommand = "I can help you managing the Vfs appointments checker!\n\n" +
-                                                            "You can control me by sending these commands:\n" +
-                                                            $"{BotCommands.GetCommandsAsString()}";
-    
-    public TelegramBotUpdatesHandler(ILogger<TelegramBotUpdatesHandler> logger, ITelegramBotCommandHandler commandHandler)
+
+    private readonly string _defaultReplyToUnsupportedCommand =
+        "I can help you managing the Vfs appointments checker!\n\n" +
+        "You can control me by sending these commands:\n" +
+        $"{BotCommands.GetCommandsAsString()}";
+
+    public TelegramBotUpdatesHandler(
+        ILogger<TelegramBotUpdatesHandler> logger,
+        ITelegramBotCommandHandler commandHandler)
     {
         _logger = logger;
         _commandHandler = commandHandler;
     }
 
-    public async Task HandleAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleAsync(
+        ITelegramBotClient botClient,
+        Update update,
+        CancellationToken cancellationToken)
     {
         // Only process Message updates: https://core.telegram.org/bots/api#message
         if (update.Message is not { Text: { } messageText } message)
@@ -28,7 +35,7 @@ public class TelegramBotUpdatesHandler
 
         _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
 
-        string reply = await getReply(messageText);
+        string reply = await GetReply(messageText);
 
         await botClient.SendTextMessageAsync(
             chatId,
@@ -36,12 +43,12 @@ public class TelegramBotUpdatesHandler
             cancellationToken: cancellationToken);
     }
 
-    private async Task<string> getReply(string messageText) =>
+    private async Task<string> GetReply(string messageText) =>
         messageText switch
         {
-            BotCommands.Check => await _commandHandler.HandleCheckAsync(),
-            BotCommands.Pause => await _commandHandler.HandlePauseAsync(),
-            BotCommands.Resume => await _commandHandler.HandleResumeAsync(),
+            BotCommands.CheckRoute => await _commandHandler.HandleCheckAsync(),
+            BotCommands.PauseRoute => await _commandHandler.HandlePauseAsync(),
+            BotCommands.ResumeRoute => await _commandHandler.HandleResumeAsync(),
             _ => _defaultReplyToUnsupportedCommand
         };
 }

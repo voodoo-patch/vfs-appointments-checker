@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 
 namespace TimedChecker.Bot.Configuration;
 
-public record TelegramSettings(string BotId)
+public class TelegramSettings
 {
-    public TelegramSettings() : this(string.Empty)
-    {
-    }
+    public const string SectionPath = "TelegramSettings";
+ 
+    [Required]
+    public required string BotToken { get; init; }
 }

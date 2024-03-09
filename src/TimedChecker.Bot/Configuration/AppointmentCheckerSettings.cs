@@ -1,19 +1,33 @@
-﻿namespace TimedChecker.Bot.Configuration;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Options;
 
-public record AppointmentCheckerSettings(string ApiBaseLocation,
-    AppointmentCheckerSettings.EndpointSettings Check,
-    AppointmentCheckerSettings.EndpointSettings Pause,
-    AppointmentCheckerSettings.EndpointSettings Resume)
+namespace TimedChecker.Bot.Configuration;
+
+public class AppointmentCheckerSettings
 {
-    public AppointmentCheckerSettings() : this(string.Empty,
-        new EndpointSettings(),
-        new EndpointSettings(),
-        new EndpointSettings())
-    {
-    }
+    public const string SectionPath = "AppointmentCheckerSettings";
+    
+    [Required]
+    public required string ApiBaseLocation { get; init; }
+    
+    [Required]
+    [ValidateObjectMembers]
+    public required EndpointSettings Check { get; init; }
+    
+    [Required]
+    [ValidateObjectMembers]
+    public required EndpointSettings Pause { get; init; }
+    
+    [Required]
+    [ValidateObjectMembers]
+    public required EndpointSettings Resume { get; init; }
 
-    public record EndpointSettings(string Method, string Path)
+    public class EndpointSettings
     {
-        public EndpointSettings() : this(String.Empty, String.Empty) { }
+        [Required]
+        public required string Method { get; init; }
+        
+        [Required]
+        public required string Path { get; init; }
     }
 }
