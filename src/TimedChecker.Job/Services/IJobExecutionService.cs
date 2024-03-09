@@ -2,7 +2,7 @@
 
 public interface IJobExecutionService
 {
-    Task Trigger();
-    Task Start();
-    Task Stop();
+    Task TriggerAsync();
+    Task StartAsync();
+    Task StopAsync();
 }

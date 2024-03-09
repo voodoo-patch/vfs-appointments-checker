@@ -1,34 +1,31 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.Playwright;
-using TimedChecker.Job.Configuration;
+using TimedChecker.Job.Options;
 
 namespace TimedChecker.Job.Services;
 
-public class VfsAppointmentsService : IAppointmentsService
+public class VfsAppointmentsService(
+    IOptions<VfsCheckerOptions> checkerOptions,
+    ICredentialsProvider credentialsProvider)
+    : IAppointmentsService
 {
-    private readonly ICredentialsProvider _credentialsProvider;
-    private readonly JobSettings _jobSettings;
-    private readonly VfsSettings _vfsSettings;
-    private IPlaywright? _playwright;
+    private const string London = "LONDON";
+    private const string Manchester = "MANCHESTER";
 
-    public VfsAppointmentsService(IOptions<VfsSettings> vfsSettings, IOptions<JobSettings> jobSettings, ICredentialsProvider credentialsProvider)
-    {
-        _credentialsProvider = credentialsProvider;
-        _jobSettings = jobSettings.Value;
-        _vfsSettings = vfsSettings.Value;
-    }
+    private readonly VfsCheckerOptions _vfsCheckerOptions = checkerOptions.Value;
+    private IPlaywright? _playwright;
 
     private async Task<IBrowser> GetBrowser()
     {
         _playwright = await Playwright.CreateAsync();
         var browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = _jobSettings.Headless
+            Headless = _vfsCheckerOptions.Browser.Headless
         });
         return browser;
     }
 
-    public async Task<(bool, IDictionary<string, string>)> GetSlots()
+    public async Task<(bool, IDictionary<string, string>)> GetSlotsAsync()
     {
         var slots = new Dictionary<string, string>();
         var browser = await GetBrowser();
@@ -38,13 +35,15 @@ public class VfsAppointmentsService : IAppointmentsService
 
         await Authenticate(page);
 
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions {Name = "Start New Booking"}).ClickAsync();
+        await page
+            .GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Start New Booking" })
+            .ClickAsync();
 
         await SelectLondonTouristVisa(page);
-        slots.Add(VfsSettings.London, await GetSlotsFromPage(page));
+        slots.Add(London, await GetSlotsFromPage(page));
 
         await SelectManchesterTouristVisa(page);
-        slots.Add(VfsSettings.Manchester, await GetSlotsFromPage(page));
+        slots.Add(Manchester, await GetSlotsFromPage(page));
 
         await context.DisposeAsync();
         await browser.DisposeAsync();
@@ -56,7 +55,7 @@ public class VfsAppointmentsService : IAppointmentsService
 
     private bool IsAppointmentAvailable(Dictionary<string, string> slots)
     {
-        return slots.Values.Any(_ => !_.Contains("No appointment"));
+        return slots.Values.Any(slot => !slot.Contains("No appointment"));
     }
 
     private async Task<string> GetSlotsFromPage(IPage page)
@@ -75,7 +74,7 @@ public class VfsAppointmentsService : IAppointmentsService
 
         await page.Locator("#mat-select-value-5").ClickAsync();
 
-        await page.GetByText("Tourist", new PageGetByTextOptions {Exact = true}).ClickAsync();
+        await page.GetByText("Tourist", new PageGetByTextOptions { Exact = true }).ClickAsync();
     }
 
     private static async Task SelectLondonTouristVisa(IPage page)
@@ -85,7 +84,7 @@ public class VfsAppointmentsService : IAppointmentsService
         await page.GetByText("Italy Visa Application Centre, London").ClickAsync();
 
         await page.Locator("div")
-            .Filter(new LocatorFilterOptions {HasText = "Select your appointment category"})
+            .Filter(new LocatorFilterOptions { HasText = "Select your appointment category" })
             .Nth(2)
             .ClickAsync();
 
@@ -102,13 +101,14 @@ public class VfsAppointmentsService : IAppointmentsService
 
     private async Task Authenticate(IPage page)
     {
-        var account = await _credentialsProvider.GetAccountAsync();
+        var account = credentialsProvider.GetAccount();
 
-        await page.GotoAsync(_vfsSettings.Urls.Authentication);
+        await page.GotoAsync(_vfsCheckerOptions.AuthenticationEndpoint);
 
         await page.Locator("input[formcontrolname=\"username\"]").FillAsync(account.Email);
         await page.Locator("input[formcontrolname=\"password\"]").FillAsync(account.Password);
 
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions {Name = "Sign In"}).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Sign In" })
+            .ClickAsync();
     }
 }

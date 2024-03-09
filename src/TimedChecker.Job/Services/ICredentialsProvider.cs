@@ -1,8 +1,8 @@
-﻿using TimedChecker.Job.Configuration;
+﻿using TimedChecker.Job.Options;
 
 namespace TimedChecker.Job.Services;
 
 public interface ICredentialsProvider
 {
-    Task<VfsSettings.AccountSettings> GetAccountAsync();
+    VfsCheckerOptions.AccountCredentials GetAccount();
 }

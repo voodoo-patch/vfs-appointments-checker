@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TimedChecker.Job.Services;
 
-public interface INotifierService
+public interface INotifier
 {
-    Task Notify(string message, IEnumerable<string> recipients);
+    Task NotifyAsync(string message, IEnumerable<string> recipients);
 }

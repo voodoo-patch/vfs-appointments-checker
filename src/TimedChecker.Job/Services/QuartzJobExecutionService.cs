@@ -14,19 +14,19 @@ public class QuartzJobExecutionService : IJobExecutionService
         _jobKey = new JobKey(AppointmentCheckerJob.Key);
     }
 
-    public async Task Trigger()
+    public async Task TriggerAsync()
     {
         var scheduler = await _schedulerFactory.GetScheduler();
         await scheduler.TriggerJob(_jobKey);
     }
 
-    public async Task Start()
+    public async Task StartAsync()
     {
         var scheduler = await _schedulerFactory.GetScheduler();
         await scheduler.Start();
     }
 
-    public async Task Stop()
+    public async Task StopAsync()
     {
         var scheduler = await _schedulerFactory.GetScheduler();
         await scheduler.Standby();

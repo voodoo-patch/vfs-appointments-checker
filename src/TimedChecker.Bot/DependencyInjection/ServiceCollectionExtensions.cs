@@ -10,44 +10,36 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
         services
-            .AddSettings()
             .AddTelegramBot()
             .AddAppointmentCheckerClient();
     
-    private static IServiceCollection AddSettings(this IServiceCollection services) =>
+    private static IServiceCollection AddTelegramBot(this IServiceCollection services) =>
         services
             .AddOptions<TelegramSettings>()
             .BindConfiguration(TelegramSettings.SectionPath)
             .ValidateDataAnnotations()
             .ValidateOnStart().Services
-            .AddOptions<AppointmentCheckerSettings>()
-            .BindConfiguration(AppointmentCheckerSettings.SectionPath)
-            .ValidateDataAnnotations()
-            .ValidateOnStart()
-            .Services;
-
-    private static IServiceCollection AddTelegramBot(this IServiceCollection services) =>
-        services
             .AddTransient<TelegramBotUpdatesHandler>()
             .AddTransient<TelegramBotErrorHandler>()
             .AddTransient<ITelegramBotCommandHandler, TelegramBotCommandHandler>()
             .AddHostedService<TelegramBotMessageReceiver>()
             .AddHealthChecks()
-            .AddCheck<TelegramBotMessageReceiver>("Telegram Bot")
-            .Services;
+            .AddCheck<TelegramBotMessageReceiver>("Telegram Bot").Services;
 
     private static IServiceCollection AddAppointmentCheckerClient(this IServiceCollection svc) =>
         svc
+            .AddOptions<AppointmentCheckerSettings>()
+            .BindConfiguration(AppointmentCheckerSettings.SectionPath)
+            .ValidateDataAnnotations()
+            .ValidateOnStart().Services
             .AddHttpClient<VfsAppointmentCheckerClient>((serviceProvider, client) =>
             {
                 var settings = serviceProvider
                     .GetRequiredService<IOptions<AppointmentCheckerSettings>>().Value;
 
                 client.BaseAddress = new Uri(settings.ApiBaseLocation);
-            })
-            .Services
+            }).Services
             .AddTransient<IAppointmentCheckerClient, VfsAppointmentCheckerClient>()
             .AddHealthChecks()
-            .AddCheck<VfsAppointmentCheckerClient>("VFS Job API")
-            .Services;
+            .AddCheck<VfsAppointmentCheckerClient>("VFS Job API").Services;
 }

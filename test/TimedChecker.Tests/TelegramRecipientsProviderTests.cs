@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using TimedChecker.Job.Configuration;
+using TimedChecker.Job.Options;
 using TimedChecker.Job.Services;
 
 
@@ -8,28 +8,30 @@ namespace TimedChecker.Tests;
 public class TelegramRecipientsProviderTests
 {
     private readonly TelegramRecipientsProvider _sut;
-    private static readonly string _channelId = "channel-id-1";
-    private static readonly IEnumerable<string> _recipients = new List<string> {_channelId};
+    private const string ChannelId = "channel-id-1";
+    private static readonly IEnumerable<string> Recipients = new List<string> { ChannelId };
 
     public TelegramRecipientsProviderTests()
     {
         _sut = new TelegramRecipientsProvider(GetTelegramConfigurationMock().Object);
     }
 
-    private Mock<IOptions<TelegramSettings>> GetTelegramConfigurationMock()
+    private Mock<IOptions<TelegramOptions>> GetTelegramConfigurationMock()
     {
-        var configurationMock = new Mock<IOptions<TelegramSettings>>();
+        var configurationMock = new Mock<IOptions<TelegramOptions>>();
         configurationMock.Setup(_ => _.Value)
-            .Returns(() => new TelegramSettings(string.Empty, string.Empty, _recipients));
+            .Returns(() => new TelegramOptions
+                { BotApiEndpoint = string.Empty, BotToken = string.Empty, Channels = Recipients });
         return configurationMock;
     }
 
     [Fact]
-    public void GetRecipients_HappyPath()
+    public async Task GetRecipients_HappyPath()
     {
-        _sut.GetRecipients().Result.Should()
+        var recipients = await _sut.GetRecipients();
+        recipients.Should()
             .HaveCount(1, "")
             .And
-            .Contain(_channelId, "");
+            .Contain(ChannelId, "");
     }
 }

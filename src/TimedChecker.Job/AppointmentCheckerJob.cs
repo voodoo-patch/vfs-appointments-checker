@@ -3,50 +3,34 @@ using TimedChecker.Job.Services;
 
 namespace TimedChecker.Job;
 
-public class AppointmentCheckerJob : IJob
+public class AppointmentCheckerJob(
+    ILogger<AppointmentCheckerJob> logger,
+    INotifier notifier,
+    IRecipientsProvider recipientsProvider,
+    IAppointmentsService appointmentsService,
+    SlotsFormatter slotsFormatter)
+    : IJob
 {
-    private readonly ILogger<AppointmentCheckerJob> _logger;
-    private readonly INotifierService _notifierService;
-    private readonly IRecipientsProvider _recipientsProvider;
-    private readonly IAppointmentsService _appointmentsService;
-    private readonly SlotsFormatter _slotsFormatter;
-
-    public AppointmentCheckerJob(ILogger<AppointmentCheckerJob> logger,
-        INotifierService notifierService,
-        IRecipientsProvider recipientsProvider,
-        IAppointmentsService appointmentsService,
-        SlotsFormatter slotsFormatter)
-    {
-        _logger = logger;
-        _notifierService = notifierService;
-        _recipientsProvider = recipientsProvider;
-        _appointmentsService = appointmentsService;
-        _slotsFormatter = slotsFormatter;
-    }
-
     public const string Key = nameof(AppointmentCheckerJob);
 
-    public async Task Execute(IJobExecutionContext context)
-    {
-        await CheckAppointmentsAndNotify();
-    }
+    public async Task Execute(IJobExecutionContext context) => await CheckAppointmentsAndNotify();
 
     private async Task CheckAppointmentsAndNotify()
     {
-        _logger.LogInformation($"{DateTime.UtcNow} - Checking for new appointments");
-        var (found, slots) = await _appointmentsService.GetSlots();
+        logger.LogInformation($"{DateTime.UtcNow} - Checking for new appointments");
+        var (found, slots) = await appointmentsService.GetSlotsAsync();
         if (found)
             await NotifySuccess(slots);
         else
-            _logger.LogInformation($"{DateTime.UtcNow} - No appointments found");
+            logger.LogInformation($"{DateTime.UtcNow} - No appointments found");
     }
 
     private async Task NotifySuccess(IDictionary<string, string> slots)
     {
-        var message = _slotsFormatter.Format(slots);
-        _logger.LogInformation(message);
+        var message = slotsFormatter.Format(slots);
+        logger.LogInformation(message);
 
-        var chatIds = await _recipientsProvider.GetRecipients();
-        await _notifierService.Notify(message, chatIds);
+        var chatIds = await recipientsProvider.GetRecipients();
+        await notifier.NotifyAsync(message, chatIds);
     }
 }

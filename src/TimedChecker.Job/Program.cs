@@ -1,19 +1,32 @@
-using TimedChecker.Job.DI;
-using TimedChecker.Job.Services;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using TimedChecker.Job.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddHttpClient()
+    .AddHealthChecks().Services
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen()
-    .AddSettings(builder.Configuration)
+    .AddApplicationServices()
     .AddQuartzJob(builder.Configuration)
-    .AddServices()
-    .AddSingleton<SlotsFormatter>();
+    .AddSwaggerGen();
 
 var app = builder.Build();
 
-app.EnableSwagger();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.MapHealthChecks("/healthz", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.MapEndpoints();
+
 app.Run();
