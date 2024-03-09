@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9BD9C86-B3FC-46A1-AB36-E54FC41A536F}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		.dockerignore = .dockerignore
+		.gitignore = .gitignore
+		README.md = README.md
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimedChecker.Job", "src\TimedChecker.Job\TimedChecker.Job.csproj", "{337535DD-E96F-47EF-A2E6-C6E6F69E3D9B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimedChecker.Tests", "test\TimedChecker.Tests\TimedChecker.Tests.csproj", "{9C8E36F7-D7A0-4C1E-A0A2-E6D00F103A49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimedChecker.Bot", "src\TimedChecker.Bot\TimedChecker.Bot.csproj", "{D04F90EF-0D24-47DE-A5F7-945AE2C4C178}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{337535DD-E96F-47EF-A2E6-C6E6F69E3D9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{337535DD-E96F-47EF-A2E6-C6E6F69E3D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{337535DD-E96F-47EF-A2E6-C6E6F69E3D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{337535DD-E96F-47EF-A2E6-C6E6F69E3D9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C8E36F7-D7A0-4C1E-A0A2-E6D00F103A49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C8E36F7-D7A0-4C1E-A0A2-E6D00F103A49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C8E36F7-D7A0-4C1E-A0A2-E6D00F103A49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C8E36F7-D7A0-4C1E-A0A2-E6D00F103A49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D04F90EF-0D24-47DE-A5F7-945AE2C4C178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D04F90EF-0D24-47DE-A5F7-945AE2C4C178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D04F90EF-0D24-47DE-A5F7-945AE2C4C178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D04F90EF-0D24-47DE-A5F7-945AE2C4C178}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BBD1E7AA-E0D7-45A3-9B76-DAB6CC59B545}
+	EndGlobalSection
+EndGlobal
