@@ -18,15 +18,16 @@ services:
       retries: 6
       start_period: 2m
 
-
   job:
     build:
       context: ./src/TimedChecker.Job
       dockerfile: ./Dockerfile
     restart: unless-stopped
     ports:
-      - "6001:8080"
+      - "6001:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=VfsChecker;User Id=sa;Password=Password123!
-      - VFS_CHECKER_BOT_TOKEN=your_token
+      - ASPNETCORE_URLS=http://+:80
+      - Telegram__BotToken=${TELEGRAM_BOT_TOKEN}
+      - Telegram__Channels__0=${TELEGRAM_CHANNEL}
+      - VfsChecker__Accounts__0__Email=${VFS_USERNAME}
+      - VfsChecker__Accounts__0__Password=${VFS_PASSWORD}
